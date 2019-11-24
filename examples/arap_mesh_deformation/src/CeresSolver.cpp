@@ -255,7 +255,7 @@ double CeresSolver::solve(const NamedParameters& solverParameters, const NamedPa
 
     //faster methods
     options.num_threads = 8;
-    options.num_linear_solver_threads = 8;
+    // options.num_linear_solver_threads = 8;
 
 #if USE_CERES_PCG
 	options.linear_solver_type = ceres::LinearSolverType::CGNR;

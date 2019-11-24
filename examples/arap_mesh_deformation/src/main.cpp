@@ -18,7 +18,7 @@ int main(int argc, const char * argv[]) {
     // For now, any model must be accompanied with a identically 
     // named (besides the extension, which must be 3 characters) mrk file
     std::string markerFilename = filename.substr(0, filename.size() - 3) + "mrk";
-    bool performanceRun = false;
+    bool performanceRun = true;
     if (argc >= 3) {
         if (std::string(argv[2]) == "perf") {
             performanceRun = true;
@@ -80,10 +80,10 @@ int main(int argc, const char * argv[]) {
     params.useOpt = true;
     if (performanceRun) {
         params.useCUDA = false;
-        params.useOpt = true;
-        params.useOptLM = true;
+        params.useOpt = false;
+        params.useOptLM = false;
         params.useCeres = true;
-        params.earlyOut = true;
+        params.earlyOut = false;
         params.nonLinearIter = 20;
         params.linearIter = 1000;
     }
