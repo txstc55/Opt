@@ -38,7 +38,7 @@
 #  define access _access
 #  define ACCESS_OK 0
 #  define PATH_SEP ";"
-#  define MKTEMP_AND_CHECK_FAILED(name) (_mktemp(name) == NULL)
+#  define MKTEMP_AND_CHECK_FAILED(name) (_mktemp(name) == nullptr)
 #else
 #  define ACCESS_OK X_OK
 #  define PATH_SEP ":"
@@ -46,8 +46,8 @@
 #endif
 
 #ifndef WIN32
-  #include <stdlib.h>
-  #include <string.h>
+
+#include <string.h>
 #else
   #ifdef __MINGW32__
     #include <stdlib.h>
@@ -368,7 +368,7 @@ void Gnuplot::plot_x(vector<double> d, const string &title)
   //
   //open temporary files for output
 #ifdef WIN32
-  if ( _mktemp(name) == NULL)
+  if ( _mktemp(name) == nullptr)
 #else
   if ( mkstemp(name) == -1 )
 #endif

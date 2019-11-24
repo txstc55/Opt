@@ -39,12 +39,7 @@
  *                                                                           *
  * ========================================================================= */
 
-/*===========================================================================*\
- *                                                                           *             
- *   $Revision$                                                         *
- *   $Date$                   *
- *                                                                           *
-\*===========================================================================*/
+
 
 /** \file Tools/Utils/HeapT.hh
     A generic heap class
@@ -79,6 +74,9 @@
 #include "Config.hh"
 #include <vector>
 #include <OpenMesh/Core/System/omstream.hh>
+#if (defined(_MSC_VER) && (_MSC_VER >= 1800)) || __cplusplus > 199711L || defined(__GXX_EXPERIMENTAL_CXX0X__)
+#include <utility>
+#endif
 
 //== NAMESPACE ================================================================
 
@@ -147,14 +145,28 @@ public:
   /// Constructor
   HeapT() : HeapVector() {}
   
+#if (defined(_MSC_VER) && (_MSC_VER >= 1800)) || __cplusplus > 199711L || defined(__GXX_EXPERIMENTAL_CXX0X__)
   /// Construct with a given \c HeapIterface. 
-  HeapT(const HeapInterface& _interface)
+  HeapT(HeapInterface _interface)
+  : HeapVector(),  interface_(std::move(_interface))
+  {}
+#else
+  /// Construct with a given \c HeapIterface.
+  explicit HeapT(const HeapInterface &_interface)
   : HeapVector(),  interface_(_interface)
   {}
-  
+#endif
+
   /// Destructor.
   ~HeapT(){};
 
+  HeapInterface &getInterface() {
+      return interface_;
+  }
+
+  const HeapInterface &getInterface() const {
+      return interface_;
+  }
 
   /// clear the heap
   void clear() { HeapVector::clear(); }
@@ -187,14 +199,14 @@ public:
   HeapEntry front() const
   { 
     assert(!empty()); 
-    return entry(0); 
+    return HeapVector::front();
   }
 
   /// delete the first entry
   void pop_front()
   {    
     assert(!empty());
-    reset_heap_position(entry(0));
+    reset_heap_position(HeapVector::front());
     if (size() > 1)
     {
       entry(0, entry(size()-1));
@@ -246,9 +258,9 @@ public:
   bool check()
   {
     bool ok(true);
-    unsigned int i, j;
-    for (i=0; i<size(); ++i)
+    for (unsigned int i=0; i<size(); ++i)
     {
+      unsigned int j;
       if (((j=left(i))<size()) && interface_.greater(entry(i), entry(j))) 
       {
         omerr() << "Heap condition violated\n";
@@ -338,13 +350,12 @@ void
 HeapT<HeapEntry, HeapInterface>::
 downheap(size_t _idx)
 {
-  HeapEntry     h = entry(_idx);
-  size_t        childIdx;
-  size_t        s = size();
+  const HeapEntry     h = entry(_idx);
+  const size_t        s = size();
   
   while(_idx < s)
   {
-    childIdx = left(_idx);
+    size_t childIdx = left(_idx);
     if (childIdx >= s) break;
     
     if ((childIdx + 1 < s) && (interface_.less(entry(childIdx + 1), entry(childIdx))))

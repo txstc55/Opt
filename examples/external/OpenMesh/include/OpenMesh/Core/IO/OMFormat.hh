@@ -39,12 +39,7 @@
  *                                                                           *
  * ========================================================================= */
 
-/*===========================================================================*\
- *                                                                           *
- *   $Revision$                                                         *
- *   $Date$                   *
- *                                                                           *
-\*===========================================================================*/
+
 
 
 #ifndef OPENMESH_IO_OMFORMAT_HH
@@ -179,7 +174,8 @@ namespace OMFormat {
       Entity_Mesh      = 0x01,
       Entity_Face      = 0x02,
       Entity_Edge      = 0x04,
-      Entity_Halfedge  = 0x06
+      Entity_Halfedge  = 0x06,
+      Entity_Sentinel  = 0x07
     };
 
     enum Dim {
@@ -256,7 +252,7 @@ namespace OMFormat {
 
       PropertyName( ) { }
 
-      PropertyName( const std::string& _name ) { *this = _name; }
+      explicit PropertyName( const std::string& _name ) { *this = _name; }
 
       bool is_valid() const { return is_valid( size() ); }
 
@@ -314,16 +310,16 @@ namespace OMFormat {
   /// Return the size of chunk data in bytes
   inline size_t chunk_data_size( Header& _hdr,  Chunk::Header& _chunk_hdr )
   {
-    size_t C     = 0;
-
+    size_t C;
     switch( _chunk_hdr.entity_ )
     {
       case Chunk::Entity_Vertex:   C  = _hdr.n_vertices_; break;
       case Chunk::Entity_Face:     C  = _hdr.n_faces_;    break;
-      case Chunk::Entity_Halfedge: C  = _hdr.n_edges_;    // no break!
-      case Chunk::Entity_Edge:     C += _hdr.n_edges_;    break;
+      case Chunk::Entity_Halfedge: C  = _hdr.n_edges_*2;  break;
+      case Chunk::Entity_Edge:     C  = _hdr.n_edges_;    break;
       case Chunk::Entity_Mesh:     C  = 1;                break;
       default:
+        C = 0;
         std::cerr << "Invalid value in _chunk_hdr.entity_\n";
         assert( false );
         break;
@@ -399,7 +395,9 @@ namespace OMFormat {
   template <typename T> Chunk::Integer_Size integer_size(const T& d)
 #endif
   {
+#ifndef NDEBUG
     assert( is_integer(d) );
+#endif
 
     switch( sizeof(T) )
     {
@@ -423,7 +421,9 @@ namespace OMFormat {
   template <typename T> Chunk::Float_Size float_size(const T& d)
 #endif
   {
+#ifndef NDEBUG
     assert( is_float(d) );
+#endif
 
     switch( sizeof(T) )
     {
@@ -463,6 +463,8 @@ namespace OMFormat {
 
 
   // ---------------------------------------- convenience functions
+
+  std::string as_string(uint8 version);
 
   const char *as_string(Chunk::Type t);
   const char *as_string(Chunk::Entity e);
@@ -739,7 +741,7 @@ namespace OMFormat {
 //=============================================================================
 #if defined(OM_INCLUDE_TEMPLATES) && !defined(OPENMESH_IO_OMFORMAT_CC)
 #  define OPENMESH_IO_OMFORMAT_TEMPLATES
-#  include "OMFormatT.cc"
+#  include "OMFormatT_impl.hh"
 #endif
 //=============================================================================
 #endif

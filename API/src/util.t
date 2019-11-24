@@ -40,8 +40,7 @@ function table.keys(tab)
 end
 
 local cuda_compute_version = 30
-# local libdevice = terralib.cudahome..string.format("/nvvm/libdevice/libdevice.compute_%d.10.bc",cuda_compute_version)
-local libdevice = terralib.cudahome.."/nvvm/libdevice/libdevice.10.bc"
+local libdevice = terralib.cudahome..string.format("/nvvm/libdevice/libdevice.compute_%d.10.bc",cuda_compute_version)
 
 local terra toYesNo(pred : int32)
     if pred ~= 0 then return "Yes" else return  "No" end

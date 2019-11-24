@@ -39,12 +39,7 @@
  *                                                                           *
  * ========================================================================= */
 
-/*===========================================================================*\
- *                                                                           *             
- *   $Revision$                                                         *
- *   $Date$                   *
- *                                                                           *
-\*===========================================================================*/
+
 
 //=============================================================================
 //
@@ -70,7 +65,7 @@
 #include <string>
 #include <algorithm>
 
-#if __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
+#if (defined(_MSC_VER) && (_MSC_VER >= 1800)) || __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
   #include <mutex>
 #endif
 
@@ -96,8 +91,8 @@ template <class T>
 class multiplex_target : public basic_multiplex_target
 {
 public:
-  multiplex_target(T& _t) : target_(_t) {}
-  virtual void operator<<(const std::string& _s) { target_ << _s; }
+  explicit multiplex_target(T& _t) : target_(_t) {}
+  virtual void operator<<(const std::string& _s) override { target_ << _s; }
 private:
   T& target_;
 };
@@ -189,7 +184,7 @@ protected:
   virtual int sync() 
   {
     // If working on multiple threads, we need to serialize the output correctly (requires c++11 headers)
-    #if __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
+    #if (defined(_MSC_VER) && (_MSC_VER >= 1800)) || __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
        std::lock_guard<std::mutex> lck (serializer_);
     #endif
 
@@ -214,7 +209,7 @@ protected:
     char c = traits_type::to_char_type(_c);
 
     // If working on multiple threads, we need to serialize the output correctly (requires c++11 headers)
-    #if __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
+    #if (defined(_MSC_VER) && (_MSC_VER >= 1800)) || __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
        {
          std::lock_guard<std::mutex> lck (serializer_);
          buffer_.push_back(c);
@@ -264,7 +259,7 @@ private:
   bool         enabled_;
 
   // If working on multiple threads, we need to serialize the output correctly (requires c++11 headers)
-  #if __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
+  #if (defined(_MSC_VER) && (_MSC_VER >= 1800)) || __cplusplus > 199711L || defined( __GXX_EXPERIMENTAL_CXX0X__ )
      std::mutex serializer_;
   #endif
 
@@ -290,7 +285,7 @@ class mostream : public std::ostream
 public:
 
   /// Explicit constructor
-  explicit mostream() : std::ostream(NULL) { init(&streambuffer_); }
+  explicit mostream() : std::ostream(nullptr) { init(&streambuffer_); }
 
 
   /// Connect target to multiplexer

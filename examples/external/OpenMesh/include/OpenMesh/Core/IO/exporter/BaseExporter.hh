@@ -39,12 +39,7 @@
  *                                                                           *
  * ========================================================================= */
 
-/*===========================================================================*\
- *                                                                           *
- *   $Revision$                                                         *
- *   $Date$                   *
- *                                                                           *
-\*===========================================================================*/
+
 
 
 //=============================================================================
@@ -103,12 +98,25 @@ public:
   virtual Vec3f colorf(VertexHandle _vh)    const = 0;
   virtual Vec4f colorAf(VertexHandle _vh)   const = 0;
   virtual Vec2f  texcoord(VertexHandle _vh) const = 0;
+  virtual Vec2f  texcoord(HalfedgeHandle _heh) const = 0;
+  virtual OpenMesh::Attributes::StatusInfo  status(VertexHandle _vh) const = 0;
 
 
   // get face data
   virtual unsigned int
   get_vhandles(FaceHandle _fh,
 	       std::vector<VertexHandle>& _vhandles) const=0;
+
+  ///
+  /// \brief getHeh returns the HalfEdgeHandle that belongs to the face
+  ///  specified by _fh and has a toVertexHandle that corresponds to _vh.
+  /// \param _fh FaceHandle that is used to search for the half edge handle
+  /// \param _vh to_vertex_handle of the searched heh
+  /// \return HalfEdgeHandle or invalid HalfEdgeHandle if none is found.
+  ///
+  virtual HalfedgeHandle getHeh(FaceHandle _fh, VertexHandle _vh) const = 0;
+  virtual unsigned int
+  get_face_texcoords(std::vector<Vec2f>& _hehandles) const = 0;
   virtual Vec3f  normal(FaceHandle _fh)      const = 0;
   virtual Vec3uc color (FaceHandle _fh)      const = 0;
   virtual Vec4uc colorA(FaceHandle _fh)      const = 0;
@@ -116,6 +124,7 @@ public:
   virtual Vec4ui colorAi(FaceHandle _fh)   const = 0;
   virtual Vec3f colorf(FaceHandle _fh)    const = 0;
   virtual Vec4f colorAf(FaceHandle _fh)   const = 0;
+  virtual OpenMesh::Attributes::StatusInfo  status(FaceHandle _fh) const = 0;
 
   // get edge data
   virtual Vec3uc color(EdgeHandle _eh)    const = 0;
@@ -124,9 +133,18 @@ public:
   virtual Vec4ui colorAi(EdgeHandle _eh)   const = 0;
   virtual Vec3f colorf(EdgeHandle _eh)    const = 0;
   virtual Vec4f colorAf(EdgeHandle _eh)   const = 0;
+  virtual OpenMesh::Attributes::StatusInfo  status(EdgeHandle _eh) const = 0;
+
+  // get halfedge data
+  virtual int get_halfedge_id(VertexHandle _vh) = 0;
+  virtual int get_halfedge_id(FaceHandle _vh) = 0;
+  virtual int get_next_halfedge_id(HalfedgeHandle _heh) = 0;
+  virtual int get_to_vertex_id(HalfedgeHandle _heh) = 0;
+  virtual int get_face_id(HalfedgeHandle _heh) = 0;
+  virtual OpenMesh::Attributes::StatusInfo  status(HalfedgeHandle _heh) const = 0;
 
   // get reference to base kernel
-  virtual const BaseKernel* kernel() { return 0; }
+  virtual const BaseKernel* kernel() { return nullptr; }
 
 
   // query number of faces, vertices, normals, texcoords
@@ -139,10 +157,14 @@ public:
   virtual bool is_triangle_mesh()     const { return false; }
   virtual bool has_vertex_normals()   const { return false; }
   virtual bool has_vertex_colors()    const { return false; }
+  virtual bool has_vertex_status()    const { return false; }
   virtual bool has_vertex_texcoords() const { return false; }
   virtual bool has_edge_colors()      const { return false; }
+  virtual bool has_edge_status()      const { return false; }
+  virtual bool has_halfedge_status()  const { return false; }
   virtual bool has_face_normals()     const { return false; }
   virtual bool has_face_colors()      const { return false; }
+  virtual bool has_face_status()      const { return false; }
 };
 
 
