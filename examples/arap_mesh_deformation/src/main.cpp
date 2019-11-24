@@ -10,7 +10,7 @@
 #include <OpenMesh/Tools/Subdivider/Uniform/Sqrt3T.hh>
 int main(int argc, const char * argv[]) {
 
-	std::string filename = "../data/small_armadillo.ply";
+	std::string filename = "../../data/small_armadillo.ply";
 
 	if (argc >= 2) {
 		filename = argv[1];
@@ -102,7 +102,9 @@ int main(int argc, const char * argv[]) {
 
     float weightFit = 4.0f;
     float weightReg = 1.0f;
+	std::cout<<"Before initializing solver\n";
     CombinedSolver solver(mesh, constraintsIdx, constraintsTarget, params, weightFit, weightReg);
+	std::cout<<"Before solve\n";
     solver.solveAll();
     SimpleMesh* res = solver.result();
 	if (!OpenMesh::IO::write_mesh(*res, "out.ply"))

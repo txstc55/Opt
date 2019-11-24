@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "OptSolver.h"
+// #include "OptSolver.h"
 #include "CombinedSolverParameters.h"
 #include "SolverIteration.h"
 #include "Config.h"
@@ -70,14 +70,14 @@ public:
 
     }
 
-    void addOptSolvers(std::vector<unsigned int> dims, std::string problemFilename, bool doublePrecision = false) {
-        if (m_combinedSolverParameters.useOpt) {
-            addSolver(std::make_shared<OptSolver>(dims, problemFilename, "gaussNewtonGPU", doublePrecision), "Opt(GN)", true);
-        }
-        if (m_combinedSolverParameters.useOptLM) {
-            addSolver(std::make_shared<OptSolver>(dims, problemFilename, "LMGPU", doublePrecision), "Opt(LM)", true);
-        }
-    }
+    // void addOptSolvers(std::vector<unsigned int> dims, std::string problemFilename, bool doublePrecision = false) {
+    //     if (m_combinedSolverParameters.useOpt) {
+    //         addSolver(std::make_shared<OptSolver>(dims, problemFilename, "gaussNewtonGPU", doublePrecision), "Opt(GN)", true);
+    //     }
+    //     if (m_combinedSolverParameters.useOptLM) {
+    //         addSolver(std::make_shared<OptSolver>(dims, problemFilename, "LMGPU", doublePrecision), "Opt(LM)", true);
+    //     }
+    // }
 
 
 
@@ -96,6 +96,7 @@ protected:
     std::vector<SolverInfo> m_solverInfo;
 
     virtual void singleSolve(SolverInfo s) {
+        std::cout<<"First single solve\n";
         preSingleSolve();
         if (m_combinedSolverParameters.numIter == 1) {
             preNonlinearSolve(0);
@@ -106,9 +107,13 @@ protected:
         else {
             for (int i = 0; i < (int)m_combinedSolverParameters.numIter; ++i) {
                 std::cout << "//////////// ITERATION" << i << "  (" << s.name << ") ///////////////" << std::endl;
+                std::cout<<"Pre solve\n";
                 preNonlinearSolve(i);
+                std::cout<<"Solve\n";
                 s.solver->solve(m_solverParams, m_problemParams, m_combinedSolverParameters.profileSolve, s.iterationInfo);
+                std::cout<<"Post solve\n";
                 postNonlinearSolve(i);
+                std::cout<<"check\n";
                 if (m_combinedSolverParameters.earlyOut || m_endSolveEarly) {
                     m_endSolveEarly = false;
                     break;

@@ -5,7 +5,7 @@
 #include <cuda_runtime.h>
 #include "../../shared/cudaUtil.h"
 #include "Configure.h"
-#include "CUDAWarpingSolver.h"
+// #include "CUDAWarpingSolver.h"
 #include "OpenMesh.h"
 #include "CeresSolver.h"
 #include "../../shared/SolverIteration.h"
@@ -29,21 +29,22 @@ class CombinedSolver : public CombinedSolverBase
 			unsigned int N = (unsigned int)mesh->n_vertices();
 
             m_dims = { N };
-            m_vertexPosFloat3           = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::GPU, true);
-            m_anglesFloat3              = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::GPU, true);
-            m_vertexPosFloat3Urshape    = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::GPU, true);
-            m_vertexPosTargetFloat3     = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::GPU, true);
+            m_vertexPosFloat3           = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::CPU, true);
+            m_anglesFloat3              = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::CPU, true);
+            m_vertexPosFloat3Urshape    = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::CPU, true);
+            m_vertexPosTargetFloat3     = createEmptyOptImage(m_dims, OptImage::Type::FLOAT, 3, OptImage::CPU, true);
 
-            initializeConnectivity();
-			resetGPUMemory();
-            
-            addSolver(std::make_shared<CUDAWarpingSolver>(N, d_numNeighbours, d_neighbourIdx, d_neighbourOffset), "CUDA", m_combinedSolverParameters.useCUDA);
+            // initializeConnectivity();
+            std::cout<<"Before resetting mem\n";
+			//  resetGPUMemory();
+            std::cout<<"Before adding ceres solver\n";
+            // addSolver(std::make_shared<CUDAWarpingSolver>(N, d_numNeighbours, d_neighbourIdx, d_neighbourOffset), "CUDA", m_combinedSolverParameters.useCUDA);
             addSolver(std::make_shared<CeresSolver>(m_dims, &m_initial), "Ceres", m_combinedSolverParameters.useCeres);
-            addOptSolvers(m_dims, "arap_mesh_deformation.t", m_combinedSolverParameters.optDoublePrecision);
+            // addOptSolvers(m_dims, "arap_mesh_deformation.t", m_combinedSolverParameters.optDoublePrecision);
 		} 
 
         virtual void combinedSolveInit() override {
-
+            std::cout<<"Combined solve init\n";
             m_problemParams.set("w_fitSqrt", &m_weightFitSqrt);
             m_problemParams.set("w_regSqrt", &m_weightRegSqrt);
             m_problemParams.set("Offset", m_vertexPosFloat3);
@@ -63,10 +64,10 @@ class CombinedSolver : public CombinedSolverBase
 
         virtual void preSingleSolve() override {
             m_result = m_initial;
-            resetGPUMemory();
+            // resetGPUMemory();
         }
         virtual void postSingleSolve() override {
-            copyResultToCPUFromFloat3();
+            // copyResultToCPUFromFloat3();
         }
         virtual void combinedSolveFinalize() override {
             if (m_combinedSolverParameters.profileSolve) {
@@ -76,6 +77,7 @@ class CombinedSolver : public CombinedSolverBase
 
 		void setConstraints(float alpha)
 		{
+            std::cout<<"Into set constraints\n";
 			unsigned int N = (unsigned int)m_result.n_vertices();
 			std::vector<float3> h_vertexPosTargetFloat3(N);
 			for (unsigned int i = 0; i < N; i++)
@@ -91,7 +93,7 @@ class CombinedSolver : public CombinedSolverBase
 				Vec3f z = (1 - alpha)*pt + alpha*target;
 				h_vertexPosTargetFloat3[m_constraintsIdx[i]] = make_float3(z[0], z[1], z[2]);
 			}
-            m_vertexPosTargetFloat3->update(h_vertexPosTargetFloat3);
+            // m_vertexPosTargetFloat3->update(h_vertexPosTargetFloat3);
 		}
 
         void initializeConnectivity() {
