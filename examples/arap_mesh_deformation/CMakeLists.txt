@@ -38,7 +38,7 @@ link_directories(${CMAKE_SOURCE_DIR}/../external/OpenMesh/lib/linux)
 
 
 ## set various homes
-set(CUDEHOME /usr/local/cuda)
+set(CUDEHOME /usr/local/cuda-10.2)
 set(TERRAHOME ${CMAKE_SOURCE_DIR}/../../../terra)
 
 
