@@ -38,7 +38,7 @@ link_directories(${CMAKE_SOURCE_DIR}/../external/OpenMesh/lib/linux)
 
 
 ## set various homes
-set(CUDEHOME /usr/local/cuda-10.2)
+set(CUDAHOME /usr/local/cuda-10.2)
 set(TERRAHOME ${CMAKE_SOURCE_DIR}/../../../terra)
 
 
@@ -51,7 +51,11 @@ link_directories(${TERRAHOME}/lib)
 ## find ceres
 find_package(Ceres REQUIRED)
 include_directories(${CERES_INCLUDE_DIRS})
+# message(STATUS ${CERES_INCLUDE_DIRS})
 
+## find eigen
+find_package (Eigen3 REQUIRED NO_MODULE)
+include_directories(${EIGEN_INCLUDE_DIRS})
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread")
 
