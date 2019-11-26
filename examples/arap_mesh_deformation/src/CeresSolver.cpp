@@ -250,7 +250,7 @@ double CeresSolver::solve(const NamedParameters& solverParameters, const NamedPa
 
     Solver::Options options;
     Solver::Summary summary;
-
+    options.dynamic_sparsity = true;
     options.minimizer_progress_to_stdout = !performanceTest;
 
     //faster methods
